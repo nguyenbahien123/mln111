@@ -74,8 +74,8 @@ export default function CyberWoodenFish() {
 
     // Low-pass to tame highs, make it woody
     lowPass.type = 'lowpass';
-    lowPass.frequency.value = 650; // darker, less metallic
-    lowPass.Q.value = 0.65;
+    lowPass.frequency.value = 600; // even darker for "Pong" sound
+    lowPass.Q.value = 0.6;
 
     // Short filtered noise burst to simulate stick-on-wood click
     const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.3, audioContext.sampleRate);
@@ -85,9 +85,9 @@ export default function CyberWoodenFish() {
     }
     noiseSource.buffer = noiseBuffer;
     noiseBand.type = 'bandpass';
-    noiseBand.frequency.value = 580;
-    noiseBand.Q.value = 1.0;
-    noiseGain.gain.value = 0.45;
+    noiseBand.frequency.value = 500;
+    noiseBand.Q.value = 0.9;
+    noiseGain.gain.value = 0.4;
     
     // Create impulse response for reverb (simulating large temple hall)
     const rate = audioContext.sampleRate;
@@ -126,8 +126,8 @@ export default function CyberWoodenFish() {
     reverbGain.gain.value = 0.28;
     masterGain.gain.value = 1.4;
 
-    // Frequencies tuned for wooden knock (no high metal shine)
-    const frequencies = [160, 240, 360, 500, 620];
+    // Frequencies tuned for wooden "Pong" sound (deep, warm)
+    const frequencies = [140, 220, 330, 450, 560];
     
     frequencies.forEach((freq, index) => {
       const osc = audioContext.createOscillator();
@@ -140,14 +140,14 @@ export default function CyberWoodenFish() {
       
       // Fast, strong attack for punch
       gainNode.gain.setValueAtTime(0, currentTime);
-      const peakGain = index === 0 ? 1.3 : (index === 1 ? 1.0 : (index === 2 ? 0.78 : (index === 3 ? 0.6 : 0.48)));
-      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.0035);
+      const peakGain = index === 0 ? 1.4 : (index === 1 ? 1.1 : (index === 2 ? 0.8 : (index === 3 ? 0.6 : 0.45)));
+      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.004);
       
       // Quick dip then sustain-ish tail
-      gainNode.gain.exponentialRampToValueAtTime(peakGain * 0.52, currentTime + 0.06);
+      gainNode.gain.exponentialRampToValueAtTime(peakGain * 0.55, currentTime + 0.07);
 
-      // Decay: bass holds longer for body, highs shorter to avoid metallic ring
-      const decayTime = index === 0 ? 1.6 : (index === 1 ? 1.2 : (index === 2 ? 0.95 : (index === 3 ? 0.78 : 0.6)));
+      // Decay: bass holds longer for deep "Pong" body
+      const decayTime = index === 0 ? 1.8 : (index === 1 ? 1.4 : (index === 2 ? 1.0 : (index === 3 ? 0.8 : 0.65)));
       gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + decayTime);
       
       osc.connect(gainNode);
@@ -341,7 +341,7 @@ export default function CyberWoodenFish() {
         
         // Add "Cốc cốc" text in italic
         floatingTextsRef.current.push({
-          text: 'KENGGGG',
+          text: 'PONGGGG',
           color: '#8B4513',
           x: centerX + 120,
           y: centerY + 30,
