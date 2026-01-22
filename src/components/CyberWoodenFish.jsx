@@ -54,120 +54,113 @@ export default function CyberWoodenFish() {
     };
   }, []);
 
-  // Function to play wooden moktak sound
+  // Function to play wooden moktak sound (warm, punchy, wood-like)
   const playKnockSound = () => {
     if (!audioContextRef.current) return;
     
     const audioContext = audioContextRef.current;
     const currentTime = audioContext.currentTime;
     
-    // Create reverb effect
+    // Create convolver for reverb effect
     const convolver = audioContext.createConvolver();
     const reverbGain = audioContext.createGain();
     const dryGain = audioContext.createGain();
     const masterGain = audioContext.createGain();
     const compressor = audioContext.createDynamicsCompressor();
+    const lowPass = audioContext.createBiquadFilter();
+    const noiseSource = audioContext.createBufferSource();
+    const noiseGain = audioContext.createGain();
+    const noiseBand = audioContext.createBiquadFilter();
+
+    // Low-pass to tame highs, make it woody
+    lowPass.type = 'lowpass';
+    lowPass.frequency.value = 650; // darker, less metallic
+    lowPass.Q.value = 0.65;
+
+    // Short filtered noise burst to simulate stick-on-wood click
+    const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.3, audioContext.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < noiseBuffer.length; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / noiseBuffer.length, 2);
+    }
+    noiseSource.buffer = noiseBuffer;
+    noiseBand.type = 'bandpass';
+    noiseBand.frequency.value = 580;
+    noiseBand.Q.value = 1.0;
+    noiseGain.gain.value = 0.45;
     
-    // Create impulse response for wooden acoustic
+    // Create impulse response for reverb (simulating large temple hall)
     const rate = audioContext.sampleRate;
-    const length = rate * 1.8; // 1.8 seconds reverb
+    const length = rate * 1.8; // 1.8 seconds reverb, tighter tail
     const impulse = audioContext.createBuffer(2, length, rate);
     const impulseL = impulse.getChannelData(0);
     const impulseR = impulse.getChannelData(1);
     
     for (let i = 0; i < length; i++) {
       const n = length - i;
-      impulseL[i] = (Math.random() * 2 - 1) * Math.pow(n / length, 3.5); // Warmer decay
-      impulseR[i] = (Math.random() * 2 - 1) * Math.pow(n / length, 3.5);
+      impulseL[i] = (Math.random() * 2 - 1) * Math.pow(n / length, 2.5);
+      impulseR[i] = (Math.random() * 2 - 1) * Math.pow(n / length, 2.5);
     }
     convolver.buffer = impulse;
     
-    // Setup audio routing
-    dryGain.connect(compressor);
+    // Setup audio routing with compressor and low-pass filter
+    dryGain.connect(lowPass);
     convolver.connect(reverbGain);
-    reverbGain.connect(compressor);
+    reverbGain.connect(lowPass);
+    noiseSource.connect(noiseBand);
+    noiseBand.connect(noiseGain);
+    noiseGain.connect(lowPass);
+    lowPass.connect(compressor);
     compressor.connect(masterGain);
     masterGain.connect(audioContext.destination);
     
-    // Compression for punch
-    compressor.threshold.value = -18;
-    compressor.knee.value = 8;
+    // Compression settings for punch
+    compressor.threshold.value = -16;
+    compressor.knee.value = 10;
     compressor.ratio.value = 5;
     compressor.attack.value = 0;
     compressor.release.value = 0.15;
     
-    // Balance dry/wet for wooden warmth
-    dryGain.gain.value = 0.75;
-    reverbGain.gain.value = 0.35; // More reverb for sustain
-    masterGain.gain.value = 1.6;
-    
-    // Tần số thấp đặc trưng của mõ gỗ (bass ấm, ít harmonics cao)
-    const frequencies = [180, 270, 360];
+    // More dry signal for clarity; keep reverb for body
+    dryGain.gain.value = 0.9;
+    reverbGain.gain.value = 0.28;
+    masterGain.gain.value = 1.4;
+
+    // Frequencies tuned for wooden knock (no high metal shine)
+    const frequencies = [160, 240, 360, 500, 620];
     
     frequencies.forEach((freq, index) => {
       const osc = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
-      const filter = audioContext.createBiquadFilter();
       
-      // Sử dụng sine wave cho âm thanh gỗ mềm mại, ấm áp
-      osc.type = 'sine';
+      // Waveforms favoring woodiness (sine/triangle only)
+      osc.type = index < 2 ? 'sine' : 'triangle';
+      
       osc.frequency.setValueAtTime(freq, currentTime);
       
-      // Lowpass filter để loại bỏ harmonics cao (đặc trưng gỗ)
-      filter.type = 'lowpass';
-      filter.frequency.value = 800;
-      filter.Q.value = 0.7;
-      
-      // --- CÚ ĐÁNH VÀO GỖ ---
+      // Fast, strong attack for punch
       gainNode.gain.setValueAtTime(0, currentTime);
+      const peakGain = index === 0 ? 1.3 : (index === 1 ? 1.0 : (index === 2 ? 0.78 : (index === 3 ? 0.6 : 0.48)));
+      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.0035);
       
-      // Âm lượng cao cho cú đánh nhưng không quá sắc
-      const peakGain = index === 0 ? 1.8 : (index === 1 ? 1.0 : 0.5);
-      
-      // Attack nhanh nhưng không cực nhanh (gỗ mềm hơn kim loại)
-      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.003);
-      
-      // Decay vừa phải - vang dài như mõ thật
-      const decayTime = index === 0 ? 1.8 : (index === 1 ? 1.5 : 1.2);
+      // Quick dip then sustain-ish tail
+      gainNode.gain.exponentialRampToValueAtTime(peakGain * 0.52, currentTime + 0.06);
+
+      // Decay: bass holds longer for body, highs shorter to avoid metallic ring
+      const decayTime = index === 0 ? 1.6 : (index === 1 ? 1.2 : (index === 2 ? 0.95 : (index === 3 ? 0.78 : 0.6)));
       gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + decayTime);
       
-      osc.connect(filter);
-      filter.connect(gainNode);
+      osc.connect(gainNode);
       gainNode.connect(dryGain);
       gainNode.connect(convolver);
       
       osc.start(currentTime);
       osc.stop(currentTime + decayTime);
     });
-    
-    // Thêm white noise để mô phỏng âm thanh va chạm gỗ
-    const bufferSize = audioContext.sampleRate * 0.08; // 80ms noise
-    const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-    const noiseData = noiseBuffer.getChannelData(0);
-    
-    for (let i = 0; i < bufferSize; i++) {
-      noiseData[i] = Math.random() * 2 - 1;
-    }
-    
-    const noiseSource = audioContext.createBufferSource();
-    const noiseGain = audioContext.createGain();
-    const noiseFilter = audioContext.createBiquadFilter();
-    
-    noiseSource.buffer = noiseBuffer;
-    noiseFilter.type = 'lowpass';
-    noiseFilter.frequency.value = 600; // Lower frequency for wood texture
-    noiseFilter.Q.value = 1.5;
-    
-    noiseSource.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(dryGain);
-    
-    // Noise envelope - short burst for wood strike
-    noiseGain.gain.setValueAtTime(0.8, currentTime);
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.05);
-    
+
+    // Trigger the noise click (very short)
     noiseSource.start(currentTime);
-    noiseSource.stop(currentTime + 0.08);
+    noiseSource.stop(currentTime + 0.12);
   };
 
   useEffect(() => {
