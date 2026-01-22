@@ -144,7 +144,7 @@ export default function GameHub() {
         <Col md={6} lg={4} xs={12}>
           <Card className="h-100 shadow-sm">
             <Card.Body>
-              <Card.Title className="text-primary">🥁 Mõ Kỹ Thuật Số</Card.Title>
+              <Card.Title className="text-primary">🥁 Gõ mõ online</Card.Title>
               <Card.Text>
                 Gõ mõ gỗ để tích luỹ công đức. Sự tĩnh tâm và nhân quả. Tích tiểu thành đại.
               </Card.Text>

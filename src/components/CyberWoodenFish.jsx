@@ -40,6 +40,8 @@ export default function CyberWoodenFish() {
     { text: 'A di đà phật 🙏', color: '#9D4EDD' },
     { text: 'Tôi không gõ nhanh đâu 😇', color: '#87CEEB' },
     { text: 'Âm thầm bên em 🏆', color: '#FFD700' },
+    { text: 'Mô phật 🙏', color: '#FF6B6B' },
+    { text: 'Lạy chúa trên cao 🙏', color: '#06D6A0' },
     { text: 'Hãy là chính mình 😇', color: '#06D6A0' },
     { text: 'Hứa không sân si 🙏', color: '#8B4513' }
     ];
@@ -299,7 +301,7 @@ export default function CyberWoodenFish() {
             setWarningText('⚠️ Tâm chưa tịnh, gõ chậm thôi thí chủ !');
           } else {
             // Already had first warning, show repeat warning
-            setWarningText('😡 Bần tăng đã nói chậm thôi mà!');
+            setWarningText('😡 Bần tăng đã nói gõ chậm thôi mà!');
           }
 
           setShowWarning(true);
@@ -410,7 +412,7 @@ export default function CyberWoodenFish() {
       ctx.fillText(`Công đức: ${state.score}`, canvas.width / 2, canvas.height / 2 + 100);
 
       ctx.font = '14px Arial';
-      ctx.fillText('Click mõ gỗ hoặc nhấn Space', canvas.width / 2, canvas.height - 30);
+      ctx.fillText('Click mõ gỗ', canvas.width / 2, canvas.height - 30);
     }, 30);
 
     return () => {
@@ -468,7 +470,7 @@ export default function CyberWoodenFish() {
     <Container className="py-5">
       <Card className="shadow-lg">
         <Card.Body>
-          <h2 className="text-center mb-3">🥁 Mõ Kỹ Thuật Số</h2>
+          <h2 className="text-center mb-3">🥁 Gõ mõ online</h2>
           <p className="text-center text-muted mb-3">
             <small>Sự tĩnh tâm và luật Nhân quả • Tích tiểu thành đại</small>
           </p>
