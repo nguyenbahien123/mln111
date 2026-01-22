@@ -54,94 +54,120 @@ export default function CyberWoodenFish() {
     };
   }, []);
 
-  // Function to play "KENGGGG" sound with reverb effect
+  // Function to play wooden moktak sound
   const playKnockSound = () => {
     if (!audioContextRef.current) return;
     
     const audioContext = audioContextRef.current;
     const currentTime = audioContext.currentTime;
     
-    // Create convolver for reverb effect
+    // Create reverb effect
     const convolver = audioContext.createConvolver();
     const reverbGain = audioContext.createGain();
     const dryGain = audioContext.createGain();
     const masterGain = audioContext.createGain();
     const compressor = audioContext.createDynamicsCompressor();
     
-    // Create impulse response for reverb (simulating large temple hall)
+    // Create impulse response for wooden acoustic
     const rate = audioContext.sampleRate;
-    const length = rate * 2.5; // 2.5 seconds reverb
+    const length = rate * 1.8; // 1.8 seconds reverb
     const impulse = audioContext.createBuffer(2, length, rate);
     const impulseL = impulse.getChannelData(0);
     const impulseR = impulse.getChannelData(1);
     
     for (let i = 0; i < length; i++) {
       const n = length - i;
-      impulseL[i] = (Math.random() * 2 - 1) * Math.pow(n / length, 2.5);
-      impulseR[i] = (Math.random() * 2 - 1) * Math.pow(n / length, 2.5);
+      impulseL[i] = (Math.random() * 2 - 1) * Math.pow(n / length, 3.5); // Warmer decay
+      impulseR[i] = (Math.random() * 2 - 1) * Math.pow(n / length, 3.5);
     }
     convolver.buffer = impulse;
     
-    // Setup audio routing with compressor
+    // Setup audio routing
     dryGain.connect(compressor);
     convolver.connect(reverbGain);
     reverbGain.connect(compressor);
     compressor.connect(masterGain);
     masterGain.connect(audioContext.destination);
     
-    // Compression settings for punch
-    compressor.threshold.value = -20;
-    compressor.knee.value = 10;
-    compressor.ratio.value = 8;
+    // Compression for punch
+    compressor.threshold.value = -18;
+    compressor.knee.value = 8;
+    compressor.ratio.value = 5;
     compressor.attack.value = 0;
-    compressor.release.value = 0.1;
+    compressor.release.value = 0.15;
     
-    // More dry signal for clarity and punch
-    dryGain.gain.value = 0.85;
-    reverbGain.gain.value = 0.35; // Less reverb for clarity
-    masterGain.gain.value = 1.8; // Even louder
+    // Balance dry/wet for wooden warmth
+    dryGain.gain.value = 0.75;
+    reverbGain.gain.value = 0.35; // More reverb for sustain
+    masterGain.gain.value = 1.6;
     
-    // Tần số tối ưu cho tiếng mõ mạnh mẽ (tránh bass quá thấp)
-    const frequencies = [220, 350, 500, 700, 950, 1300];
+    // Tần số thấp đặc trưng của mõ gỗ (bass ấm, ít harmonics cao)
+    const frequencies = [180, 270, 360];
     
     frequencies.forEach((freq, index) => {
       const osc = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
+      const filter = audioContext.createBiquadFilter();
       
-      // Sử dụng sóng phù hợp
-      if (index < 2) {
-        osc.type = 'sine'; // Bass frequencies
-      } else if (index < 4) {
-        osc.type = 'triangle'; // Mid frequencies - warmer
-      } else {
-        osc.type = 'sine'; // High frequencies for brightness
-      }
-      
+      // Sử dụng sine wave cho âm thanh gỗ mềm mại, ấm áp
+      osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, currentTime);
       
-      // --- CÚ ĐÁNH MẠNH MẼ - Attack cực nhanh và mạnh ---
+      // Lowpass filter để loại bỏ harmonics cao (đặc trưng gỗ)
+      filter.type = 'lowpass';
+      filter.frequency.value = 800;
+      filter.Q.value = 0.7;
+      
+      // --- CÚ ĐÁNH VÀO GỖ ---
       gainNode.gain.setValueAtTime(0, currentTime);
       
-      // Âm lượng cực cao cho attack (tạo cú đánh mạnh)
-      const peakGain = index === 0 ? 1.5 : (index === 1 ? 1.3 : (index === 2 ? 0.9 : (index === 3 ? 0.7 : 0.5)));
+      // Âm lượng cao cho cú đánh nhưng không quá sắc
+      const peakGain = index === 0 ? 1.8 : (index === 1 ? 1.0 : 0.5);
       
-      // Attack cực nhanh (0.002s) để tạo độ "punch"
-      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.002);
+      // Attack nhanh nhưng không cực nhanh (gỗ mềm hơn kim loại)
+      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.003);
       
-      // Giảm nhanh một chút sau đó vang dài
-      gainNode.gain.exponentialRampToValueAtTime(peakGain * 0.4, currentTime + 0.05);
-      
-      // Tiếng vang giảm dần (Decay) - bass vang lâu
-      const decayTime = index === 0 ? 2.0 : (index === 1 ? 1.5 : (index === 2 ? 1.2 : 0.8));
+      // Decay vừa phải - vang dài như mõ thật
+      const decayTime = index === 0 ? 1.8 : (index === 1 ? 1.5 : 1.2);
       gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + decayTime);
       
-      osc.connect(gainNode);
+      osc.connect(filter);
+      filter.connect(gainNode);
       gainNode.connect(dryGain);
       gainNode.connect(convolver);
       
       osc.start(currentTime);
       osc.stop(currentTime + decayTime);
     });
+    
+    // Thêm white noise để mô phỏng âm thanh va chạm gỗ
+    const bufferSize = audioContext.sampleRate * 0.08; // 80ms noise
+    const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+    const noiseData = noiseBuffer.getChannelData(0);
+    
+    for (let i = 0; i < bufferSize; i++) {
+      noiseData[i] = Math.random() * 2 - 1;
+    }
+    
+    const noiseSource = audioContext.createBufferSource();
+    const noiseGain = audioContext.createGain();
+    const noiseFilter = audioContext.createBiquadFilter();
+    
+    noiseSource.buffer = noiseBuffer;
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.value = 600; // Lower frequency for wood texture
+    noiseFilter.Q.value = 1.5;
+    
+    noiseSource.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(dryGain);
+    
+    // Noise envelope - short burst for wood strike
+    noiseGain.gain.setValueAtTime(0.8, currentTime);
+    noiseGain.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.05);
+    
+    noiseSource.start(currentTime);
+    noiseSource.stop(currentTime + 0.08);
   };
 
   useEffect(() => {
