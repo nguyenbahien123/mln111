@@ -8,18 +8,126 @@ export default function ZodiacGame() {
 
   const getZodiacSign = (day, month) => {
     const zodiacSigns = [
-      { name: 'Ma Kết ♑', start: [12, 22], end: [1, 19], traits: 'Kiên định, thực tế, có trách nhiệm, kỷ luật cao' },
-      { name: 'Bảo Bình ♒', start: [1, 20], end: [2, 18], traits: 'Độc lập, sáng tạo, nhân đạo, thích tự do' },
-      { name: 'Song Ngư ♓', start: [2, 19], end: [3, 20], traits: 'Nhạy cảm, giàu trí tưởng tượng, từ bi, nghệ sĩ' },
-      { name: 'Bạch Dương ♈', start: [3, 21], end: [4, 19], traits: 'Dũng cảm, nhiệt huyết, quyết đoán, năng động' },
-      { name: 'Kim Ngưu ♉', start: [4, 20], end: [5, 20], traits: 'Kiên nhẫn, đáng tin, thích ổn định, yêu vật chất' },
-      { name: 'Song Tử ♊', start: [5, 21], end: [6, 20], traits: 'Thông minh, linh hoạt, giao tiếp tốt, tò mò' },
-      { name: 'Cự Giải ♋', start: [6, 21], end: [7, 22], traits: 'Tình cảm, bảo vệ, trung thành, yêu gia đình' },
-      { name: 'Sư Tử ♌', start: [7, 23], end: [8, 22], traits: 'Tự tin, hào phóng, lãnh đạo, tự tôn cao' },
-      { name: 'Xử Nữ ♍', start: [8, 23], end: [9, 22], traits: 'Tỉ mỉ, hoàn hảo, thực tế, phân tích tốt' },
-      { name: 'Thiên Bình ♎', start: [9, 23], end: [10, 22], traits: 'Công bằng, hòa nhã, thẩm mỹ, giao tiếp' },
-      { name: 'Bọ Cạp ♏', start: [10, 23], end: [11, 21], traits: 'Đam mê, quyết liệt, bí ẩn, trung thành' },
-      { name: 'Nhân Mã ♐', start: [11, 22], end: [12, 21], traits: 'Tự do, lạc quan, phiêu lưu, triết học' },
+      { 
+        name: 'Ma Kết ♑', 
+        start: [12, 22], 
+        end: [1, 19], 
+        traits: 'Kiên định, thực tế, có trách nhiệm, kỷ luật cao',
+        career: 'Quản lý, kinh doanh, kế hoạch, tài chính',
+        love: 'Trung thành, ổn định, có kế hoạch',
+        health: 'Cần vận động, tránh công việc căng thẳng',
+        compatible: 'Sư Tử, Bạch Dương, Kim Ngưu'
+      },
+      { 
+        name: 'Bảo Bình ♒', 
+        start: [1, 20], 
+        end: [2, 18], 
+        traits: 'Độc lập, sáng tạo, nhân đạo, thích tự do',
+        career: 'Công nghệ, nghiên cứu, sáng tạo, tuyên truyền',
+        love: 'Cần độc lập, tự do, hiểu biết lẫn nhau',
+        health: 'Lành mạnh, cần hoạt động vận động',
+        compatible: 'Thiên Bình, Bọ Cạp, Nhân Mã'
+      },
+      { 
+        name: 'Song Ngư ♓', 
+        start: [2, 19], 
+        end: [3, 20], 
+        traits: 'Nhạy cảm, giàu trí tưởng tượng, từ bi, nghệ sĩ',
+        career: 'Nghệ thuật, âm nhạc, thiết kế, giáo dục',
+        love: 'Lãng mạn, cảm xúc, cần sự yêu thương',
+        health: 'Cần xả stress, yoga, tâm linh',
+        compatible: 'Cự Giải, Bọ Cạp, Xử Nữ'
+      },
+      { 
+        name: 'Bạch Dương ♈', 
+        start: [3, 21], 
+        end: [4, 19], 
+        traits: 'Dũng cảm, nhiệt huyết, quyết đoán, năng động',
+        career: 'Kinh doanh, quân sự, lãnh đạo, thể thao',
+        love: 'Cái tính, nóng nảy, cần đối tác mạnh mẽ',
+        health: 'Tìm sở thích thể thao, tránh quá sức',
+        compatible: 'Kim Ngưu, Sư Tử, Bảo Bình'
+      },
+      { 
+        name: 'Kim Ngưu ♉', 
+        start: [4, 20], 
+        end: [5, 20], 
+        traits: 'Kiên nhẫn, đáng tin, thích ổn định, yêu vật chất',
+        career: 'Tài chính, bất động sản, nông nghiệp, xây dựng',
+        love: 'Trung thành, ổn định, lâu dài',
+        health: 'Cần chế độ ăn uống lành mạnh',
+        compatible: 'Bạch Dương, Cự Giải, Xử Nữ'
+      },
+      { 
+        name: 'Song Tử ♊', 
+        start: [5, 21], 
+        end: [6, 20], 
+        traits: 'Thông minh, linh hoạt, giao tiếp tốt, tò mò',
+        career: 'Truyền thông, giáo dục, bán hàng, du lịch',
+        love: 'Cần giao tiếp, có chủ ý, hay thay đổi',
+        health: 'Cần thư giãn tinh thần, hoạt động',
+        compatible: 'Thiên Bình, Bảo Bình, Sư Tử'
+      },
+      { 
+        name: 'Cự Giải ♋', 
+        start: [6, 21], 
+        end: [7, 22], 
+        traits: 'Tình cảm, bảo vệ, trung thành, yêu gia đình',
+        career: 'Giáo dục, xã hội, gia đình, chính trị',
+        love: 'Tình cảm sâu sắc, yêu gia đình',
+        health: 'Cần cân bằng cảm xúc, giảm lo âu',
+        compatible: 'Kim Ngưu, Song Ngư, Thiên Bình'
+      },
+      { 
+        name: 'Sư Tử ♌', 
+        start: [7, 23], 
+        end: [8, 22], 
+        traits: 'Tự tin, hào phóng, lãnh đạo, tự tôn cao',
+        career: 'Lãnh đạo, giải trí, quản lý, kinh doanh',
+        love: 'Lãng mạn, cần khâm phục, cấp tiến',
+        health: 'Cần hoạt động, thể thao, tự tin',
+        compatible: 'Bạch Dương, Bảo Bình, Song Tử'
+      },
+      { 
+        name: 'Xử Nữ ♍', 
+        start: [8, 23], 
+        end: [9, 22], 
+        traits: 'Tỉ mỉ, hoàn hảo, thực tế, phân tích tốt',
+        career: 'Kế toán, khoa học, phân tích, y tế',
+        love: 'Cẩn thận, cần thời gian tìm hiểu',
+        health: 'Cần kiểm tra sức khỏe định kỳ',
+        compatible: 'Kim Ngưu, Song Ngư, Bọ Cạp'
+      },
+      { 
+        name: 'Thiên Bình ♎', 
+        start: [9, 23], 
+        end: [10, 22], 
+        traits: 'Công bằng, hòa nhã, thẩm mỹ, giao tiếp',
+        career: 'Pháp luật, ngoại giao, thiết kế, thương mại',
+        love: 'Cần sự cân bằng, công bằng, hòa hợp',
+        health: 'Cần tránh lo lắng, giữ bình tĩnh',
+        compatible: 'Song Tử, Cự Giải, Bảo Bình'
+      },
+      { 
+        name: 'Bọ Cạp ♏', 
+        start: [10, 23], 
+        end: [11, 21], 
+        traits: 'Đam mê, quyết liệt, bí ẩn, trung thành',
+        career: 'Tâm lý, điều tra, tài chính, quân sự',
+        love: 'Đam mê, sâu sắc, bí ẩn, trung thành',
+        health: 'Cần giải tỏa stress, yoga, tâm linh',
+        compatible: 'Song Ngư, Xử Nữ, Bảo Bình'
+      },
+      { 
+        name: 'Nhân Mã ♐', 
+        start: [11, 22], 
+        end: [12, 21], 
+        traits: 'Tự do, lạc quan, phiêu lưu, triết học',
+        career: 'Du lịch, giáo dục, quản lý, thể thao',
+        love: 'Tự do, lạc quan, cần phiêu lưu',
+        health: 'Cần hoạt động, du lịch, tập luyện',
+        compatible: 'Sư Tử, Bảo Bình, Ma Kết'
+      },
     ];
 
     for (const sign of zodiacSigns) {
@@ -30,7 +138,7 @@ export default function ZodiacGame() {
         (month === startMonth && day >= startDay) ||
         (month === endMonth && day <= endDay)
       ) {
-        return { name: sign.name, traits: sign.traits };
+        return sign;
       }
     }
     return zodiacSigns[0];
@@ -186,8 +294,20 @@ export default function ZodiacGame() {
                         ⭐ Cung Hoàng Đạo
                       </Card.Title>
                       <h4 className="my-3">{result.zodiac.name}</h4>
-                      <Card.Text className="text-muted">
+                      <Card.Text className="text-muted small">
                         <strong>Tính cách:</strong> {result.zodiac.traits}
+                      </Card.Text>
+                      <Card.Text className="text-muted small">
+                        <strong>Sự nghiệp:</strong> {result.zodiac.career}
+                      </Card.Text>
+                      <Card.Text className="text-muted small">
+                        <strong>Tình cảm:</strong> {result.zodiac.love}
+                      </Card.Text>
+                      <Card.Text className="text-muted small">
+                        <strong>Sức khỏe:</strong> {result.zodiac.health}
+                      </Card.Text>
+                      <Card.Text className="text-muted small">
+                        <strong>Tương thích:</strong> {result.zodiac.compatible}
                       </Card.Text>
                     </Card.Body>
                   </Card>
@@ -223,16 +343,37 @@ export default function ZodiacGame() {
               </Row>
 
               <Alert variant="light" className="mt-4 border">
-                <h5 className="mb-3">💫 Tổng Kết Tính Cách</h5>
-                <p className="mb-2">
-                  Bạn là người có cung {result.zodiac.name}, tuổi {result.chineseZodiac.name}, 
-                  mệnh {result.element.name}. Sự kết hợp này tạo nên một con người:
+                <h5 className="mb-3">💫 Tổng Kết Bản Đồ Sao</h5>
+                <p className="mb-3">
+                  Bạn là người có cung <strong>{result.zodiac.name}</strong>, tuổi <strong>{result.chineseZodiac.name}</strong>, 
+                  mệnh <strong>{result.element.name}</strong>.
                 </p>
-                <ul className="mb-0">
-                  <li><strong>Cung hoàng đạo:</strong> {result.zodiac.traits}</li>
-                  <li><strong>Con giáp:</strong> {result.chineseZodiac.traits}</li>
-                  <li><strong>Ngũ hành:</strong> {result.element.traits}</li>
-                </ul>
+                <div className="row g-3">
+                  <div className="col-md-6">
+                    <h6>🎯 Tính Cách & Đặc Điểm:</h6>
+                    <ul className="mb-0 small">
+                      <li><strong>Cung:</strong> {result.zodiac.traits}</li>
+                      <li><strong>Tuổi:</strong> {result.chineseZodiac.traits}</li>
+                      <li><strong>Mệnh:</strong> {result.element.traits}</li>
+                    </ul>
+                  </div>
+                  <div className="col-md-6">
+                    <h6>💼 Sự Nghiệp & Công Việc:</h6>
+                    <p className="mb-0 small">{result.zodiac.career}</p>
+                  </div>
+                  <div className="col-md-6">
+                    <h6>💕 Tình Cảm & Tình Yêu:</h6>
+                    <p className="mb-0 small">{result.zodiac.love}</p>
+                  </div>
+                  <div className="col-md-6">
+                    <h6>❤️ Sức Khỏe & Sống:</h6>
+                    <p className="mb-0 small">{result.zodiac.health}</p>
+                  </div>
+                  <div className="col-12">
+                    <h6>🤝 Tương Thích Với:</h6>
+                    <p className="mb-0 small">{result.zodiac.compatible}</p>
+                  </div>
+                </div>
               </Alert>
 
               <div className="text-center mt-4">
