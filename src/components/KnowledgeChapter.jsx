@@ -70,9 +70,7 @@ export default function KnowledgeChapter() {
         </div>
       </div>
 
-      <Alert variant="secondary" className="mb-3" style={{ border: '1px solid #e9ecef' }}>
-        Toàn bộ câu hỏi và phương án của chương này được liệt kê bên dưới. Dòng đúng được làm nổi bật để bạn dễ theo dõi.
-      </Alert>
+      
 
       {questions.map((q, idx) => (
         <Card

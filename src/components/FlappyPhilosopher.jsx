@@ -11,6 +11,7 @@ export default function FlappyPhilosopher() {
   const [gameRunning, setGameRunning] = useState(true);
   const [gameOver, setGameOver] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [showWinModal, setShowWinModal] = useState(false);
 
   const gameState = useRef({
     birdY: 200,
@@ -22,7 +23,8 @@ export default function FlappyPhilosopher() {
     gameOverFlag: false,
     lastQuoteScore: 0,
     pipeSpeed: 3,
-    frameCount: 0
+    frameCount: 0,
+    gravityIncrement: 0.0002
   });
 
   const quoteAlertRef = useRef(null);
@@ -80,6 +82,9 @@ export default function FlappyPhilosopher() {
     const gameLoop = setInterval(() => {
       state.frameCount++;
 
+      // Tăng độ khó dần theo thời gian
+      state.gravity += state.gravityIncrement;
+
       // Physics
       state.birdVelocity += state.gravity;
       state.birdY += state.birdVelocity;
@@ -119,6 +124,13 @@ export default function FlappyPhilosopher() {
           pipe.passed = true;
           state.score++;
           setScore(state.score);
+
+          // Kiểm tra chiến thắng - 100 cột
+          if (state.score === 100) {
+            state.gameOverFlag = true;
+            setGameRunning(false);
+            setShowWinModal(true);
+          }
 
           // Show quote every 3 pipes
           if (state.score % 3 === 0 && state.score > state.lastQuoteScore) {
@@ -262,11 +274,13 @@ export default function FlappyPhilosopher() {
       gameOverFlag: false,
       lastQuoteScore: 0,
       pipeSpeed: 3,
-      frameCount: 0
+      frameCount: 0,
+      gravityIncrement: 0.0002
     };
     setScore(0);
     setCurrentQuote(null);
     setGameOver(false);
+    setShowWinModal(false);
     setGameRunning(true);
   };
 
@@ -319,6 +333,22 @@ export default function FlappyPhilosopher() {
           </div>
         </Card.Body>
       </Card>
+
+      <Modal show={showWinModal} onHide={() => setShowWinModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>🎉 Chúc mừng!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h4 className="text-center mb-3">Bạn đã chiến thắng! 🏆</h4>
+          <p className="text-center">Damn, bạn đã vượt qua 100 cột và chứng tỏ là một triết gia thực sự!</p>
+          <p className="text-center text-muted">Score: <strong>{score}</strong></p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleRestart}>
+            🔄 Chơi lại
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal show={showExitModal} onHide={() => setShowExitModal(false)} centered>
         <Modal.Header closeButton>
