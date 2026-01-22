@@ -3,6 +3,7 @@ import { Container, Card, Button, Alert, Modal, ProgressBar } from 'react-bootst
 
 export default function CyberWoodenFish() {
   const canvasRef = useRef(null);
+  const audioContextRef = useRef(null);
   const [score, setScore] = useState(0);
   const [enlightenment, setEnlightenment] = useState(0);
   const [clicks, setClicks] = useState(0);
@@ -42,6 +43,106 @@ export default function CyberWoodenFish() {
     { text: 'Hãy là chính mình 😇', color: '#06D6A0' },
     { text: 'Hứa không sân si 🙏', color: '#8B4513' }
     ];
+
+  // Initialize audio context
+  useEffect(() => {
+    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    return () => {
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+    };
+  }, []);
+
+  // Function to play "KENGGGG" sound with reverb effect
+  const playKnockSound = () => {
+    if (!audioContextRef.current) return;
+    
+    const audioContext = audioContextRef.current;
+    const currentTime = audioContext.currentTime;
+    
+    // Create convolver for reverb effect
+    const convolver = audioContext.createConvolver();
+    const reverbGain = audioContext.createGain();
+    const dryGain = audioContext.createGain();
+    const masterGain = audioContext.createGain();
+    const compressor = audioContext.createDynamicsCompressor();
+    
+    // Create impulse response for reverb (simulating large temple hall)
+    const rate = audioContext.sampleRate;
+    const length = rate * 2.5; // 2.5 seconds reverb
+    const impulse = audioContext.createBuffer(2, length, rate);
+    const impulseL = impulse.getChannelData(0);
+    const impulseR = impulse.getChannelData(1);
+    
+    for (let i = 0; i < length; i++) {
+      const n = length - i;
+      impulseL[i] = (Math.random() * 2 - 1) * Math.pow(n / length, 2.5);
+      impulseR[i] = (Math.random() * 2 - 1) * Math.pow(n / length, 2.5);
+    }
+    convolver.buffer = impulse;
+    
+    // Setup audio routing with compressor
+    dryGain.connect(compressor);
+    convolver.connect(reverbGain);
+    reverbGain.connect(compressor);
+    compressor.connect(masterGain);
+    masterGain.connect(audioContext.destination);
+    
+    // Compression settings for punch
+    compressor.threshold.value = -20;
+    compressor.knee.value = 10;
+    compressor.ratio.value = 8;
+    compressor.attack.value = 0;
+    compressor.release.value = 0.1;
+    
+    // More dry signal for clarity and punch
+    dryGain.gain.value = 0.85;
+    reverbGain.gain.value = 0.35; // Less reverb for clarity
+    masterGain.gain.value = 1.8; // Even louder
+    
+    // Tần số tối ưu cho tiếng mõ mạnh mẽ (tránh bass quá thấp)
+    const frequencies = [220, 350, 500, 700, 950, 1300];
+    
+    frequencies.forEach((freq, index) => {
+      const osc = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      // Sử dụng sóng phù hợp
+      if (index < 2) {
+        osc.type = 'sine'; // Bass frequencies
+      } else if (index < 4) {
+        osc.type = 'triangle'; // Mid frequencies - warmer
+      } else {
+        osc.type = 'sine'; // High frequencies for brightness
+      }
+      
+      osc.frequency.setValueAtTime(freq, currentTime);
+      
+      // --- CÚ ĐÁNH MẠNH MẼ - Attack cực nhanh và mạnh ---
+      gainNode.gain.setValueAtTime(0, currentTime);
+      
+      // Âm lượng cực cao cho attack (tạo cú đánh mạnh)
+      const peakGain = index === 0 ? 1.5 : (index === 1 ? 1.3 : (index === 2 ? 0.9 : (index === 3 ? 0.7 : 0.5)));
+      
+      // Attack cực nhanh (0.002s) để tạo độ "punch"
+      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.002);
+      
+      // Giảm nhanh một chút sau đó vang dài
+      gainNode.gain.exponentialRampToValueAtTime(peakGain * 0.4, currentTime + 0.05);
+      
+      // Tiếng vang giảm dần (Decay) - bass vang lâu
+      const decayTime = index === 0 ? 2.0 : (index === 1 ? 1.5 : (index === 2 ? 1.2 : 0.8));
+      gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + decayTime);
+      
+      osc.connect(gainNode);
+      gainNode.connect(dryGain);
+      gainNode.connect(convolver);
+      
+      osc.start(currentTime);
+      osc.stop(currentTime + decayTime);
+    });
+  };
 
   useEffect(() => {
     if (!gameRunning) return;
@@ -197,6 +298,9 @@ export default function CyberWoodenFish() {
         state.clickCount = 0;
         state.lastClickTime = now;
 
+        // Play knock sound
+        playKnockSound();
+
         // Update score
         state.score += 1;
         state.enlightenment = Math.min(100, state.enlightenment + 5);
@@ -218,7 +322,7 @@ export default function CyberWoodenFish() {
         
         // Add "Cốc cốc" text in italic
         floatingTextsRef.current.push({
-          text: 'Cốc cốc',
+          text: 'KENGGGG',
           color: '#8B4513',
           x: centerX + 120,
           y: centerY + 30,
