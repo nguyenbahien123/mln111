@@ -1,0 +1,9 @@
+.quiz-answer-btn {
+  text-align: left;
+  padding: 12px;
+}
+
+.quiz-answer-btn.active {
+  background-color: #0d6efd;
+  color: white;
+}
