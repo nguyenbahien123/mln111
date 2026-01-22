@@ -74,8 +74,8 @@ export default function CyberWoodenFish() {
 
     // Low-pass to tame highs, make it woody
     lowPass.type = 'lowpass';
-    lowPass.frequency.value = 600; // even darker for "Pong" sound
-    lowPass.Q.value = 0.6;
+    lowPass.frequency.value = 680; // brighter for Cóc tone
+    lowPass.Q.value = 0.7;
 
     // Short filtered noise burst to simulate stick-on-wood click
     const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.3, audioContext.sampleRate);
@@ -85,13 +85,13 @@ export default function CyberWoodenFish() {
     }
     noiseSource.buffer = noiseBuffer;
     noiseBand.type = 'bandpass';
-    noiseBand.frequency.value = 500;
-    noiseBand.Q.value = 0.9;
-    noiseGain.gain.value = 0.4;
+    noiseBand.frequency.value = 480;
+    noiseBand.Q.value = 1.2;
+    noiseGain.gain.value = 0.42;
     
     // Create impulse response for reverb (simulating large temple hall)
     const rate = audioContext.sampleRate;
-    const length = rate * 1.8; // 1.8 seconds reverb, tighter tail
+    const length = rate * 0.55; // 0.55 seconds reverb
     const impulse = audioContext.createBuffer(2, length, rate);
     const impulseL = impulse.getChannelData(0);
     const impulseR = impulse.getChannelData(1);
@@ -122,12 +122,12 @@ export default function CyberWoodenFish() {
     compressor.release.value = 0.15;
     
     // More dry signal for clarity; keep reverb for body
-    dryGain.gain.value = 0.9;
-    reverbGain.gain.value = 0.28;
-    masterGain.gain.value = 1.4;
+    dryGain.gain.value = 0.92;
+    reverbGain.gain.value = 0.16;
+    masterGain.gain.value = 1.65;
 
-    // Frequencies tuned for wooden "Pong" sound (deep, warm)
-    const frequencies = [140, 220, 330, 450, 560];
+    // Frequencies tuned for wooden "Cóc" sound (bright tone)
+    const frequencies = [130, 220, 360, 520, 660];
     
     frequencies.forEach((freq, index) => {
       const osc = audioContext.createOscillator();
@@ -140,14 +140,14 @@ export default function CyberWoodenFish() {
       
       // Fast, strong attack for punch
       gainNode.gain.setValueAtTime(0, currentTime);
-      const peakGain = index === 0 ? 1.4 : (index === 1 ? 1.1 : (index === 2 ? 0.8 : (index === 3 ? 0.6 : 0.45)));
-      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.004);
+      const peakGain = index === 0 ? 1.5 : (index === 1 ? 1.2 : (index === 2 ? 0.9 : (index === 3 ? 0.7 : 0.55)));
+      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.0015);
       
-      // Quick dip then sustain-ish tail
-      gainNode.gain.exponentialRampToValueAtTime(peakGain * 0.55, currentTime + 0.07);
+      // Quick dip then sustain-ish tail for ringing
+      gainNode.gain.exponentialRampToValueAtTime(peakGain * 0.25, currentTime + 0.022);
 
-      // Decay: bass holds longer for deep "Pong" body
-      const decayTime = index === 0 ? 1.8 : (index === 1 ? 1.4 : (index === 2 ? 1.0 : (index === 3 ? 0.8 : 0.65)));
+      // Decay: very short for sharp "Cóc" knock
+      const decayTime = index === 0 ? 0.25 : (index === 1 ? 0.21 : (index === 2 ? 0.18 : (index === 3 ? 0.15 : 0.13)));
       gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + decayTime);
       
       osc.connect(gainNode);
@@ -339,9 +339,9 @@ export default function CyberWoodenFish() {
           vy: -2 // Slower movement
         });
         
-        // Add "Cốc cốc" text in italic
+        // Add "Cóc cóc" text in italic
         floatingTextsRef.current.push({
-          text: 'PONGGGG',
+          text: 'CÓCCCC',
           color: '#8B4513',
           x: centerX + 120,
           y: centerY + 30,
