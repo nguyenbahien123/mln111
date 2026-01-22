@@ -74,8 +74,8 @@ export default function CyberWoodenFish() {
 
     // Low-pass to tame highs, make it woody
     lowPass.type = 'lowpass';
-    lowPass.frequency.value = 680; // brighter for Cóc tone
-    lowPass.Q.value = 0.7;
+    lowPass.frequency.value = 350; // warm woody tone
+    lowPass.Q.value = 0.9;
 
     // Short filtered noise burst to simulate stick-on-wood click
     const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.3, audioContext.sampleRate);
@@ -85,13 +85,13 @@ export default function CyberWoodenFish() {
     }
     noiseSource.buffer = noiseBuffer;
     noiseBand.type = 'bandpass';
-    noiseBand.frequency.value = 480;
-    noiseBand.Q.value = 1.2;
-    noiseGain.gain.value = 0.42;
+    noiseBand.frequency.value = 380;
+    noiseBand.Q.value = 1.0;
+    noiseGain.gain.value = 0.25;
     
     // Create impulse response for reverb (simulating large temple hall)
     const rate = audioContext.sampleRate;
-    const length = rate * 0.55; // 0.55 seconds reverb
+    const length = rate * 0.35; // 0.35 seconds reverb
     const impulse = audioContext.createBuffer(2, length, rate);
     const impulseL = impulse.getChannelData(0);
     const impulseR = impulse.getChannelData(1);
@@ -122,26 +122,26 @@ export default function CyberWoodenFish() {
     compressor.release.value = 0.15;
     
     // More dry signal for clarity; keep reverb for body
-    dryGain.gain.value = 0.92;
-    reverbGain.gain.value = 0.16;
-    masterGain.gain.value = 1.65;
+    dryGain.gain.value = 0.94;
+    reverbGain.gain.value = 0.1;
+    masterGain.gain.value = 1.55;
 
     // Frequencies tuned for wooden "Cóc" sound (bright tone)
-    const frequencies = [130, 220, 360, 520, 660];
+    const frequencies = [85, 160, 280, 420, 540];
     
     frequencies.forEach((freq, index) => {
       const osc = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
-      // Waveforms favoring woodiness (sine/triangle only)
-      osc.type = index < 2 ? 'sine' : 'triangle';
+      // Waveforms favoring woodiness (sine-dominant for warmth)
+      osc.type = index < 3 ? 'sine' : 'triangle';
       
       osc.frequency.setValueAtTime(freq, currentTime);
       
       // Fast, strong attack for punch
       gainNode.gain.setValueAtTime(0, currentTime);
-      const peakGain = index === 0 ? 1.5 : (index === 1 ? 1.2 : (index === 2 ? 0.9 : (index === 3 ? 0.7 : 0.55)));
-      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.0015);
+      const peakGain = index === 0 ? 1.4 : (index === 1 ? 1.1 : (index === 2 ? 0.85 : (index === 3 ? 0.65 : 0.5)));
+      gainNode.gain.linearRampToValueAtTime(peakGain, currentTime + 0.0025);
       
       // Quick dip then sustain-ish tail for ringing
       gainNode.gain.exponentialRampToValueAtTime(peakGain * 0.25, currentTime + 0.022);
